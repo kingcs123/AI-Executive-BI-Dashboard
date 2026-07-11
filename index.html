@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MIS Executive BI Dashboard | AI-Driven Corporate Insights</title>
+
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Chart.js DataLabels Plugin CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+  <!-- Top Horizontal Header & Navigation Bar -->
+  <header class="navbar">
+    <div class="navbar-brand">
+      <div class="logo-icon">BI</div>
+      <div class="logo-text">BI Dashboard</div>
+    </div>
+
+    <nav class="navbar-nav">
+      <button class="nav-item active" data-tab="overview">
+        <i data-lucide="layout-dashboard"></i>
+        <span>Overview</span>
+      </button>
+      <button class="nav-item" data-tab="financials">
+        <i data-lucide="trending-up"></i>
+        <span>Sales & Targets</span>
+      </button>
+      <button class="nav-item" data-tab="products">
+        <i data-lucide="shopping-bag"></i>
+        <span>Product Performance</span>
+      </button>
+      <button class="nav-item" data-tab="operations">
+        <i data-lucide="users"></i>
+        <span>Manager & Operations</span>
+      </button>
+      <button class="nav-item" data-tab="customers">
+        <i data-lucide="user-check"></i>
+        <span>Customer Insights</span>
+      </button>
+    </nav>
+
+    <div class="navbar-meta">
+      <span class="badge" id="dataLoadedBadge"
+        style="background-color: var(--primary-light); color: var(--primary); padding: 0.5rem 0.8rem; border-radius: var(--border-radius-sm); font-weight: 600;">
+        <i data-lucide="database" style="width: 14px; height: 14px; margin-right: 0.25rem; vertical-align: middle;"></i>
+        Loading Dataset...
+      </span>
+      <button class="btn-export" id="btnExportCSV" title="Export current filtered data to CSV">
+        <i data-lucide="download"></i>
+        <span>Export CSV</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="app-container">
+
+    <!-- Main Dashboard Area -->
+    <main class="main-content">
+
+      <!-- Dashboard Title Bar -->
+      <div class="dashboard-title-bar">
+        <h1 id="pageTitle">Executive BI Dashboard</h1>
+        <p id="pageSubtitle">Real-time management information & analytics system</p>
+      </div>
+
+      <!-- Global Filter Panel -->
+      <section class="filters-panel">
+        <div class="filters-header">
+          <h2>
+            <i data-lucide="sliders-horizontal"></i>
+            <span>Global Corporate Filters</span>
+          </h2>
+          <button class="btn-reset-filters" id="btnResetFilters">
+            <i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i>
+            <span>Reset All Filters</span>
+          </button>
+        </div>
+
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label for="filterRegion">Region</label>
+            <select id="filterRegion" class="filter-control">
+              <option value="ALL">All Regions</option>
+              <option value="Central">Central</option>
+              <option value="East">East</option>
+              <option value="South">South</option>
+              <option value="West">West</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filterManager">Manager</label>
+            <select id="filterManager" class="filter-control">
+              <option value="ALL">All Managers</option>
+              <option value="Alice Smith">Alice Smith</option>
+              <option value="Bob Jones">Bob Jones</option>
+              <option value="Charlie Brown">Charlie Brown</option>
+              <option value="Diana Prince">Diana Prince</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filterSegment">Segment</label>
+            <select id="filterSegment" class="filter-control">
+              <option value="ALL">All Segments</option>
+              <option value="Consumer">Consumer</option>
+              <option value="Corporate">Corporate</option>
+              <option value="Home Office">Home Office</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filterCategory">Category</label>
+            <select id="filterCategory" class="filter-control">
+              <option value="ALL">All Categories</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Furniture">Furniture</option>
+              <option value="Office Supplies">Office Supplies</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filterStartDate">Order Date From</label>
+            <input type="date" id="filterStartDate" class="filter-control">
+          </div>
+
+          <div class="filter-group">
+            <label for="filterEndDate">Order Date To</label>
+            <input type="date" id="filterEndDate" class="filter-control">
+          </div>
+        </div>
+      </section>
+
+      <!-- Executive KPI Cards -->
+      <section class="kpi-grid" id="kpiGridContainer">
+        <!-- Sales KPI Card -->
+        <div class="kpi-card" id="kpiCard1">
+          <div class="kpi-header">
+            <span class="kpi-title" id="kpiTitle1">Total Revenue</span>
+            <div class="kpi-icon-wrapper" id="kpiIconWrapper1">
+              <i data-lucide="dollar-sign"></i>
+            </div>
+          </div>
+          <div class="kpi-value" id="kpiValue1">$0.00</div>
+          <div class="kpi-subtext" id="kpiSubtext1">
+            <span class="trend-badge positive" id="kpiSalesTrend">
+              <i data-lucide="trending-up" style="width: 12px; height: 12px;"></i>
+              <span id="kpiSalesTrendPct">0%</span>
+            </span>
+            <span style="color: var(--text-secondary);">vs sales target</span>
+          </div>
+        </div>
+
+        <!-- Profit KPI Card -->
+        <div class="kpi-card" id="kpiCard2">
+          <div class="kpi-header">
+            <span class="kpi-title" id="kpiTitle2">Net Profit</span>
+            <div class="kpi-icon-wrapper success" id="kpiIconWrapper2">
+              <i data-lucide="briefcase"></i>
+            </div>
+          </div>
+          <div class="kpi-value" id="kpiValue2">$0.00</div>
+          <div class="kpi-subtext" id="kpiSubtext2">
+            <span class="trend-badge positive" id="kpiProfitMargin">
+              <span id="kpiProfitMarginPct">0%</span>
+            </span>
+            <span style="color: var(--text-secondary);">profit margin</span>
+          </div>
+        </div>
+
+        <!-- Target Achievement KPI Card -->
+        <div class="kpi-card" id="kpiCard3">
+          <div class="kpi-header">
+            <span class="kpi-title" id="kpiTitle3">Target Achievement</span>
+            <div class="kpi-icon-wrapper warning" id="kpiIconWrapper3">
+              <i data-lucide="target"></i>
+            </div>
+          </div>
+          <div class="kpi-value" id="kpiValue3">0%</div>
+          <div class="kpi-subtext" id="kpiSubtext3"
+            style="flex-direction: column; align-items: flex-start; gap: 0.25rem; width: 100%;">
+            <div
+              style="display: flex; justify-content: space-between; width: 100%; font-size: 0.75rem; color: var(--text-secondary);">
+              <span>Progress to target</span>
+              <span id="kpiAchievementSummary">$0 / $0</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar" id="kpiAchievementProgress" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Returns Rate KPI Card -->
+        <div class="kpi-card" id="kpiCard4">
+          <div class="kpi-header">
+            <span class="kpi-title" id="kpiTitle4">Order Return Rate</span>
+            <div class="kpi-icon-wrapper danger" id="kpiIconWrapper4">
+              <i data-lucide="refresh-ccw"></i>
+            </div>
+          </div>
+          <div class="kpi-value" id="kpiValue4">0.00%</div>
+          <div class="kpi-subtext" id="kpiSubtext4">
+            <span class="trend-badge negative" id="kpiReturnCount">
+              <span id="kpiReturnCountVal">0 returns</span>
+            </span>
+            <span style="color: var(--text-secondary);">from orders log</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab Content 1: Overview -->
+      <div id="tab-overview" class="tab-content active">
+        <!-- Main Visualization Row -->
+        <div class="charts-grid">
+          <!-- Monthly Performance Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">
+                <h3>Monthly Performance Breakdown</h3>
+                <p>Monthly Sales, Profit, and Targets Tracking</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="chartMonthlyPerformance"></canvas>
+            </div>
+          </div>
+
+          <!-- Category Contribution Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">
+                <h3>Revenue by Category</h3>
+                <p>Top level category sales distribution</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="chartCategoryShare"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Executive Insights Card -->
+        <section class="insights-card">
+          <div class="insights-header">
+            <div class="insights-icon">
+              <i data-lucide="sparkles"></i>
+            </div>
+            <h3>Dynamic Executive Insights (AI Engine)</h3>
+          </div>
+          <div class="insights-list" id="insightsListOverview">
+            <div class="insight-item info">
+              <div class="insight-indicator"><i data-lucide="info"></i></div>
+              <div class="insight-text">
+                <h4>Analyzing data...</h4>
+                <p>Generating contextual overview insights...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Tab Content 2: Financials (Sales & Targets) -->
+      <div id="tab-financials" class="tab-content">
+        <div class="charts-grid">
+          <!-- Monthly Profitability Margin Line Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">
+                <h3>Monthly Profit Margin % Trend</h3>
+                <p>Tracks standard profit margins (Net Profit / Revenue)</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="chartProfitMarginTrend"></canvas>
+            </div>
+          </div>
+
+          <!-- Sales vs Cost Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">
+                <h3>Cost vs Selling Price</h3>
+                <p>Aggregated product margins comparison</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="chartCostVsSellingPrice"></canvas>
+            </div>
+          </div>
+
+          <!-- Discount Impact Analysis Chart -->
+          <div class="chart-card" style="grid-column: span 2;">
+            <div class="chart-header">
+              <div class="chart-title">
+                <h3>Discount Impact & Profitability Analysis</h3>
+                <p>Average Discount Rate vs Net Profit Margin % by Sub-Category</p>
+              </div>
+            </div>
+            <div class="chart-container" style="min-height: 350px;">
+              <canvas id="chartDiscountImpact"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Executive Insights Card -->
+        <section class="insights-card">
+          <div class="insights-header">
+            <div class="insights-icon">
+              <i data-lucide="sparkles"></i>
+            </div>
+            <h3>Financials & Target Insights (AI Engine)</h3>
+          </div>
+          <div class="insights-list" id="insightsListFinancials">
+            <div class="insight-item info">
+              <div class="insight-indicator"><i data-lucide="info"></i></div>
+              <div class="insight-text">
+                <h4>Analyzing financials...</h4>
+                <p>Generating sales performance and variance analysis...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Tab Content 3: Products -->
+      <div id="tab-products" class="tab-content">
+        <div class="charts-grid">
+          <!-- Subcategory Performance Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">
+                <h3>Sub-Category Sales & Net Profit</h3>
+                <p>Compare product sub-categories sorted by revenue</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="chartSubCategoryPerformance"></canvas>
+            </div>
+          </div>
+
+          <!-- Brand Performance Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">
+                <h3>Brand Performance Leaderboard</h3>
+                <p>Revenue and Net Profit margin by Product Brand</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="chartBrandPerformance"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Executive Insights Card -->
+        <section class="insights-card">
+          <div class="insights-header">
+            <div class="insights-icon">
+              <i data-lucide="sparkles"></i>
+            </div>
+            <h3>Product Performance Insights (AI Engine)</h3>
+          </div>
+          <div class="insights-list" id="insightsListProducts">
+            <div class="insight-item info">
+              <div class="insight-indicator"><i data-lucide="info"></i></div>
+              <div class="insight-text">
+                <h4>Analyzing catalog...</h4>
+                <p>Generating category, brand, and discount insights...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Tab Content 4: Operations (Managers & Returns) -->
+      <div id="tab-operations" class="tab-content">
+        <div class="charts-grid">
+          <!-- Manager Target Achievement Horizontal Bar Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">
+                <h3>Sales vs Sales Target by Manager</h3>
+                <p>Identifies target performance metrics for team managers</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="chartManagerPerformance"></canvas>
+            </div>
+          </div>
+
+          <!-- Return Reasons Analysis Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">
+                <h3>Customer Return Reason Analysis</h3>
+                <p>Breakdown of 40 returned orders by reason code</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="chartReturnReasons"></canvas>
+            </div>
+          </div>
+
+          <!-- Regional Sales & Returns Heatmap -->
+          <div class="chart-card" style="grid-column: span 2;">
+            <div class="chart-header">
+              <div class="chart-title">
+                <h3>Regional Sales vs Order Returns</h3>
+                <p>Compare total sales and return volume across regions</p>
+              </div>
+            </div>
+            <div class="chart-container" style="min-height: 350px;">
+              <canvas id="chartRegionalAnalysis"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Executive Insights Card -->
+        <section class="insights-card">
+          <div class="insights-header">
+            <div class="insights-icon">
+              <i data-lucide="sparkles"></i>
+            </div>
+            <h3>Operations & Returns Insights (AI Engine)</h3>
+          </div>
+          <div class="insights-list" id="insightsListOperations">
+            <div class="insight-item info">
+              <div class="insight-indicator"><i data-lucide="info"></i></div>
+              <div class="insight-text">
+                <h4>Analyzing operations...</h4>
+                <p>Generating manager, returns, and regional insights...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Tab Content 5: Customers -->
+      <div id="tab-customers" class="tab-content">
+        <div class="charts-grid">
+          <!-- Customer Segment Share Doughnut Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">
+                <h3>Customer Segment Share</h3>
+                <p>Distribution of sales revenue by segment</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="chartSegmentShare"></canvas>
+            </div>
+          </div>
+
+          <!-- Top 10 Customers Leaderboard Horizontal Bar Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">
+                <h3>Top 10 Customers Leaderboard</h3>
+                <p>Highest spending customer accounts by sales revenue</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="chartTopCustomers"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Executive Insights Card -->
+        <section class="insights-card">
+          <div class="insights-header">
+            <div class="insights-icon">
+              <i data-lucide="sparkles"></i>
+            </div>
+            <h3>Customer Loyalty Insights (AI Engine)</h3>
+          </div>
+          <div class="insights-list" id="insightsListCustomers">
+            <div class="insight-item info">
+              <div class="insight-indicator"><i data-lucide="info"></i></div>
+              <div class="insight-text">
+                <h4>Analyzing loyalty...</h4>
+                <p>Generating customer segments and high spender insights...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </main>
+  </div>
+
+  <style>
+    /* Simple inline keyframe for spin animation of loader */
+    @keyframes spin {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+
+</html>
